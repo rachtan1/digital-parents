@@ -1,128 +1,99 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Digital Habits Tracker</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
-    :root {
-      --blue: #3c84ff;
-      --purple: #b082f7;
-      --teal: #2bd4b3;
-      --light-bg: #f7f9fc;
-      --gray: #6b7280;
-      --card-radius: 12px;
-      --card-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
-    }
-
     body {
       margin: 0;
       font-family: 'Inter', sans-serif;
-      background-color: var(--light-bg);
+      background-color: #f7f9fc;
       color: #1a1a1a;
     }
-
     header {
       background-color: #fff;
       padding: 1rem 1.5rem;
-      box-shadow: var(--card-shadow);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.06);
       display: flex;
       justify-content: space-between;
       align-items: center;
     }
-
     header h1 {
-      color: var(--blue);
+      color: #3c84ff;
     }
-
     nav a {
       margin-left: 1rem;
       text-decoration: none;
       color: #1a1a1a;
       font-weight: 600;
     }
-
     .container {
       padding: 1rem;
     }
-
     .section {
       margin-bottom: 2rem;
     }
-
-    h2 {
-      color: var(--purple);
-    }
-
     .input-group {
       display: flex;
       gap: 0.5rem;
       margin-bottom: 1rem;
       flex-wrap: wrap;
     }
-
     input, select, button {
       padding: 0.5rem;
       border-radius: 6px;
       border: 1px solid #ccc;
     }
-
     button {
-      background-color: var(--blue);
+      background-color: #3c84ff;
       color: white;
       font-weight: bold;
       cursor: pointer;
     }
-
     .summary-box, .tracker-table, .apps-used {
       background-color: #fff;
       padding: 1rem;
-      border-radius: var(--card-radius);
-      box-shadow: var(--card-shadow);
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.06);
       margin-bottom: 1rem;
     }
-
     table {
       width: 100%;
       border-collapse: collapse;
     }
-
     th, td {
       padding: 0.5rem;
       border-bottom: 1px solid #eee;
     }
-
-    .icon {
-      margin-right: 0.5rem;
+    canvas {
+      max-width: 100%;
     }
   </style>
 </head>
 <body>
   <header>
-    <h1>Digital Parents</h1>
+    <h1><a href="index.html" style="text-decoration: none; color: inherit;">Digital Parents</a></h1>
     <nav>
       <a href="index.html">Home</a>
       <a href="conversation-starters.html">Conversation Starters</a>
       <a href="screen-time-guide.html">Screen Time Guide</a>
     </nav>
   </header>
-
   <main class="container">
-    <!-- Child Names -->
     <section class="section">
-      <h2><i class="fa-solid fa-user icon"></i>Children Profiles</h2>
+      <h2>Children Profiles</h2>
       <div class="input-group">
         <input type="text" id="childNameInput" placeholder="Enter child name">
         <button onclick="addChild()">Add</button>
       </div>
       <div id="childrenSummary" class="summary-box"></div>
     </section>
-
-    <!-- Habit Tracker -->
     <section class="section">
-      <h2><i class="fa-solid fa-laptop icon"></i>Digital Usage Tracker</h2>
+      <h2>Digital Usage Tracker</h2>
       <div class="input-group">
         <select id="childSelect"></select>
         <select id="deviceSelect">
@@ -138,21 +109,24 @@
           <option>Gaming</option>
         </select>
         <input type="number" id="durationInput" placeholder="Minutes">
+        <input type="date" id="dateInput">
         <button onclick="logUsage()">Track</button>
       </div>
       <div class="tracker-table">
         <table>
           <thead>
-            <tr><th>Child</th><th>Device</th><th>Usage</th><th>Duration</th></tr>
+            <tr><th>Child</th><th>Device</th><th>Usage</th><th>Duration</th><th>Date</th></tr>
           </thead>
           <tbody id="trackerBody"></tbody>
         </table>
       </div>
     </section>
-
-    <!-- Apps Used -->
     <section class="section">
-      <h2><i class="fa-solid fa-mobile-screen icon"></i>Apps Used</h2>
+      <h2>Usage Chart</h2>
+      <canvas id="usageChart"></canvas>
+    </section>
+    <section class="section">
+      <h2>Apps Used</h2>
       <div class="input-group">
         <select id="appChildSelect"></select>
         <input type="text" id="appInput" placeholder="Enter app name">
@@ -160,105 +134,10 @@
       </div>
       <div id="appsUsed" class="apps-used"></div>
     </section>
-
-    <!-- Download -->
     <section class="section">
-      <button onclick="downloadSummary()"><i class="fa-solid fa-download icon"></i>Download Summary</button>
+      <button onclick="downloadSummary()">Download Summary</button>
     </section>
   </main>
-
-  <script>
-    const children = [];
-    const usageLogs = [];
-    const appLogs = {};
-
-    function addChild() {
-      const name = document.getElementById('childNameInput').value;
-      if (name && children.length < 5) {
-        children.push(name);
-        document.getElementById('childNameInput').value = '';
-        updateChildSelectors();
-        displayChildren();
-      }
-    }
-
-    function updateChildSelectors() {
-      const selects = [document.getElementById('childSelect'), document.getElementById('appChildSelect')];
-      selects.forEach(select => {
-        select.innerHTML = '';
-        children.forEach(name => {
-          const option = document.createElement('option');
-          option.value = name;
-          option.textContent = name;
-          select.appendChild(option);
-        });
-      });
-    }
-
-    function displayChildren() {
-      const summary = document.getElementById('childrenSummary');
-      summary.innerHTML = '<strong>Children being tracked:</strong><br>' + children.join(', ');
-    }
-
-    function logUsage() {
-      const child = document.getElementById('childSelect').value;
-      const device = document.getElementById('deviceSelect').value;
-      const usage = document.getElementById('usageSelect').value;
-      const duration = document.getElementById('durationInput').value;
-      if (child && duration) {
-        usageLogs.push({ child, device, usage, duration });
-        updateTrackerTable();
-      }
-    }
-
-    function updateTrackerTable() {
-      const tbody = document.getElementById('trackerBody');
-      tbody.innerHTML = '';
-      usageLogs.forEach(log => {
-        const row = `<tr><td>${log.child}</td><td>${log.device}</td><td>${log.usage}</td><td>${log.duration} min</td></tr>`;
-        tbody.innerHTML += row;
-      });
-    }
-
-    function addApp() {
-      const child = document.getElementById('appChildSelect').value;
-      const app = document.getElementById('appInput').value;
-      if (!appLogs[child]) appLogs[child] = [];
-      if (app) {
-        appLogs[child].push(app);
-        document.getElementById('appInput').value = '';
-        displayApps();
-      }
-    }
-
-    function displayApps() {
-      const container = document.getElementById('appsUsed');
-      container.innerHTML = '';
-      for (const child in appLogs) {
-        const apps = appLogs[child].join(', ');
-        const div = document.createElement('div');
-        div.innerHTML = `<strong>${child}:</strong> ${apps}`;
-        container.appendChild(div);
-      }
-    }
-
-    function downloadSummary() {
-      let content = 'Digital Habits Summary\\n\\n';
-      content += 'Children: ' + children.join(', ') + '\\n\\n';
-      content += 'Usage Logs:\\n';
-      usageLogs.forEach(log => {
-        content += `${log.child} - ${log.device} - ${log.usage} - ${log.duration} min\\n`;
-      });
-      content += '\\nApps Used:\\n';
-      for (const child in appLogs) {
-        content += `${child}: ${appLogs[child].join(', ')}\\n`;
-      }
-      const blob = new Blob([content], { type: 'text/plain' });
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(blob);
-      a.download = 'digital_habits_summary.txt';
-      a.click();
-    }
-  </script>
+  <script src="js/tracker.js"></script>
 </body>
 </html>
