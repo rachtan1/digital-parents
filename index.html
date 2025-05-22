@@ -4,7 +4,89 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Welcome - Digital Parents</title>
-  <link rel="stylesheet" href="css/styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --blue: #3c84ff;
+      --purple: #b082f7;
+      --light-bg: #f7f9fc;
+      --gray: #6b7280;
+      --card-radius: 12px;
+      --card-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Inter', sans-serif;
+      background-color: var(--light-bg);
+      color: #1a1a1a;
+    }
+
+    header {
+      background-color: #fff;
+      padding: 1rem 1.5rem;
+      box-shadow: var(--card-shadow);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    header h1 {
+      color: var(--blue);
+    }
+
+    nav a {
+      margin-left: 1rem;
+      text-decoration: none;
+      color: #1a1a1a;
+      font-weight: 600;
+    }
+
+    .container {
+      padding: 1rem;
+      max-width: 800px;
+      margin: auto;
+      text-align: center;
+    }
+
+    .hero-img {
+      max-width: 100%;
+      border-radius: var(--card-radius);
+      margin: 1.5rem 0;
+    }
+
+    .tagline {
+      font-size: 1.25rem;
+      color: var(--purple);
+      font-weight: 600;
+      margin-bottom: 2rem;
+    }
+
+    .cards {
+      display: grid;
+      gap: 1rem;
+    }
+
+    .card {
+      background-color: #fff;
+      padding: 1rem;
+      border-radius: var(--card-radius);
+      box-shadow: var(--card-shadow);
+      text-align: left;
+    }
+
+    .card a {
+      text-decoration: none;
+      color: var(--blue);
+      font-weight: 600;
+    }
+
+    @media (min-width: 600px) {
+      .cards {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+  </style>
 </head>
 <body>
   <header>
@@ -15,9 +97,11 @@
       <a href="digital-habits-tracker.html">Digital Habits Tracker</a>
     </nav>
   </header>
+
   <main class="container">
-    <img class="hero-img" src="assets/family-time.jpg" alt="Family bonding without screens">
+    <img class="hero-img" src="https://www.familiesforlife.sg/images/default-source/default-album/family-time-no-phones.jpg" alt="Family bonding without screens">
     <div class="tagline">Empowering parents to raise mindful, screen-smart children.</div>
+
     <h2>Featured Resources</h2>
     <div class="cards">
       <div class="card">
@@ -34,3 +118,4 @@
   </main>
 </body>
 </html>
+
