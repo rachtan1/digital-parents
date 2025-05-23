@@ -1,4 +1,4 @@
-const children = [];
+const children = JSON.parse(localStorage.getItem('children')) || [];
 const usageLogs = JSON.parse(localStorage.getItem('usageLogs')) || [];
 const appLogs = JSON.parse(localStorage.getItem('appLogs')) || {};
 
@@ -7,6 +7,7 @@ function addChild() {
   if (name && children.length < 5) {
     children.push(name);
     document.getElementById('childNameInput').value = '';
+    localStorage.setItem('children', JSON.stringify(children));
     updateChildSelectors();
     displayChildren();
   }
