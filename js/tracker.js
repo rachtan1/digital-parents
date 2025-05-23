@@ -1,4 +1,3 @@
-
 const children = [];
 const usageLogs = JSON.parse(localStorage.getItem('usageLogs')) || [];
 const appLogs = JSON.parse(localStorage.getItem('appLogs')) || {};
@@ -57,32 +56,46 @@ function updateTrackerTable() {
 
 function updateChart() {
   const ctx = document.getElementById('usageChart').getContext('2d');
-  const grouped = usageLogs.reduce((acc, log) => {
-    const key = `${log.child} (${log.date})`;
-    acc[key] = (acc[key] || 0) + parseInt(log.duration);
-    return acc;
-  }, {});
+  const categories = {
+    Educational: {},
+    Entertainment: {},
+    'Social Media': {},
+    Gaming: {}
+  };
 
-  const labels = Object.keys(grouped);
-  const data = Object.values(grouped);
+  usageLogs.forEach(log => {
+    const key = `${log.child} (${log.date})`;
+    const value = parseInt(log.duration);
+    if (!categories[log.usage]) categories[log.usage] = {};
+    categories[log.usage][key] = (categories[log.usage][key] || 0) + value;
+  });
+
+  const allLabels = Array.from(new Set(Object.values(categories).flatMap(obj => Object.keys(obj))));
+
+  const datasetColors = {
+    Educational: '#2bd4b3',
+    Entertainment: '#f59e0b',
+    'Social Media': '#6366f1',
+    Gaming: '#ef4444'
+  };
+
+  const datasets = Object.keys(categories).map(type => ({
+    label: type,
+    data: allLabels.map(label => categories[type][label] || 0),
+    backgroundColor: datasetColors[type] || '#ccc'
+  }));
 
   if (window.usageChartInstance) window.usageChartInstance.destroy();
   window.usageChartInstance = new Chart(ctx, {
     type: 'bar',
     data: {
-      labels,
-      datasets: [{
-        label: 'Screen Time (min)',
-        data,
-        backgroundColor: '#3c84ff'
-      }]
+      labels: allLabels,
+      datasets: datasets
     },
     options: {
       responsive: true,
       scales: {
-        y: {
-          beginAtZero: true
-        }
+        y: { beginAtZero: true }
       }
     }
   });
@@ -112,15 +125,15 @@ function displayApps() {
 }
 
 function downloadSummary() {
-  let content = 'Digital Habits Summary\n\n';
-  content += 'Children: ' + children.join(', ') + '\n\n';
-  content += 'Usage Logs:\n';
+  let content = 'Digital Habits Summary\\n\\n';
+  content += 'Children: ' + children.join(', ') + '\\n\\n';
+  content += 'Usage Logs:\\n';
   usageLogs.forEach(log => {
-    content += `${log.child} - ${log.device} - ${log.usage} - ${log.duration} min - ${log.date}\n`;
+    content += `${log.child} - ${log.device} - ${log.usage} - ${log.duration} min - ${log.date}\\n`;
   });
-  content += '\nApps Used:\n';
+  content += '\\nApps Used:\\n';
   for (const child in appLogs) {
-    content += `${child}: ${appLogs[child].join(', ')}\n`;
+    content += `${child}: ${appLogs[child].join(', ')}\\n`;
   }
   const blob = new Blob([content], { type: 'text/plain' });
   const a = document.createElement('a');
